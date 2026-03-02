@@ -4,6 +4,33 @@ import math
 import ccxt
 import pandas as pd
 from datetime import datetime, timezone
+import logging
+from pathlib import Path
+
+LOG_DIR = os.getenv("LOG_DIR", "/app/logs")     # <-- matches your Coolify volume mount
+LOG_PREFIX = os.getenv("LOG_PREFIX", "solbot")  # optional
+
+Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
+log_file = os.path.join(
+    LOG_DIR,
+    f"{LOG_PREFIX}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.log"
+)
+
+logger = logging.getLogger("bot")
+logger.setLevel(logging.INFO)
+
+fmt = logging.Formatter("%(asctime)sZ %(message)s", datefmt="%Y-%m-%dT%H:%M:%S")
+
+# 1) File handler (persistent)
+fh = logging.FileHandler(log_file)
+fh.setFormatter(fmt)
+logger.addHandler(fh)
+
+# 2) Console handler (Coolify logs)
+ch = logging.StreamHandler()
+ch.setFormatter(fmt)
+logger.addHandler(ch)
+#==============
 
 # ================== CONFIG ==================
 SYMBOL = os.getenv("SYMBOL", "SOL/USDT")
@@ -50,7 +77,7 @@ last_trend_check = 0
 trend_ok = False
 
 def log(msg: str):
-    print(f"{datetime.now(timezone.utc).isoformat()}Z {msg}", flush=True)
+    logger.info(msg)
 
 def day_key_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
