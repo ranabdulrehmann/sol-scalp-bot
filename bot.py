@@ -12,13 +12,13 @@ exchange = ccxt.mexc({
     "enableRateLimit": True,
 })
 
-print("Bot started. Reading price...")
+print("Bot started. Reading price...", flush=True)
 
 while True:
     try:
         t = exchange.fetch_ticker(SYMBOL)
-        print("Price:", t["last"])
+        print("Price:", t["last"], flush=True)
         time.sleep(15)
     except Exception as e:
-        print("Error:", e)
+        print("Error:", e, flush=True)
         time.sleep(30)
